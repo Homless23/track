@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const AuditLog = require('../models/AuditLog');
+const Budget = require('../models/Budget');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -168,14 +169,27 @@ exports.getLogs = async (req, res) => {
 // @desc    Delete account and associated data
 // @route   DELETE /api/auth/deleteaccount
 exports.deleteAccount = async (req, res) => {
-  try {
-    // Delete transactions first to avoid orphan data
-    await Transaction.deleteMany({ user: req.user });
-    // Delete user profile
-    await User.findByIdAndDelete(req.user);
+  const session = await User.startSession();
 
+  try {
+    session.startTransaction();
+
+    // Delete all user-linked data to avoid orphaned records.
+    await Promise.all([
+      Transaction.deleteMany({ user: req.user }).session(session),
+      Budget.deleteMany({ user: req.user }).session(session),
+      AuditLog.deleteMany({ user: req.user }).session(session)
+    ]);
+
+    // Delete user profile.
+    await User.findByIdAndDelete(req.user).session(session);
+
+    await session.commitTransaction();
     res.status(200).json({ success: true, data: {} });
   } catch (err) {
+    await session.abortTransaction();
     res.status(500).json({ success: false, error: 'Account deletion failed' });
+  } finally {
+    session.endSession();
   }
 };
