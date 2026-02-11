@@ -13,6 +13,7 @@ import Register from './components/Register';
 import Dashboard from './pages/Dashboard';
 import Transactions from './pages/Transactions';
 import Analytics from './pages/Analytics';
+import Budget from './pages/Budget';
 import History from './pages/History';
 import Settings from './pages/Settings';
 
@@ -45,6 +46,7 @@ function App() {
           <Route path="/" element={<PrivateRoute><MainLayout><Dashboard /></MainLayout></PrivateRoute>} />
           <Route path="/transactions" element={<PrivateRoute><MainLayout><Transactions /></MainLayout></PrivateRoute>} />
           <Route path="/analytics" element={<PrivateRoute><MainLayout><Analytics /></MainLayout></PrivateRoute>} />
+          <Route path="/budget" element={<PrivateRoute><MainLayout><Budget /></MainLayout></PrivateRoute>} />
           <Route path="/history" element={<PrivateRoute><MainLayout><History /></MainLayout></PrivateRoute>} />
           <Route path="/settings" element={<PrivateRoute><MainLayout><Settings /></MainLayout></PrivateRoute>} />
           

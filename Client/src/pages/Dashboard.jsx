@@ -9,72 +9,75 @@ const Dashboard = () => {
     // eslint-disable-next-line
   }, []);
 
-  // --- Logic ---
-  const amounts = transactions.map(t => t.amount);
-  const total = amounts.reduce((acc, item) => (acc += item), 0).toFixed(2);
-  const income = amounts.filter(item => item > 0).reduce((acc, item) => (acc += item), 0).toFixed(2);
-  const expense = (amounts.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1).toFixed(2);
+  const amounts = transactions.map((t) => t.amount);
+  const total = amounts.reduce((acc, item) => acc + item, 0);
+  const income = amounts.filter((item) => item > 0).reduce((acc, item) => acc + item, 0);
+  const expense = amounts.filter((item) => item < 0).reduce((acc, item) => acc + item, 0) * -1;
 
-  // --- Inline Styles ---
-  const styles = {
-    grid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-      gap: '24px',
-      marginTop: '30px'
-    },
-    card: {
-      background: 'var(--bg-card)',
-      border: '1px solid var(--border-subtle)',
-      padding: '24px',
-      borderRadius: '20px',
-      position: 'relative',
-      overflow: 'hidden'
-    },
-    label: { color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: '600' },
-    value: { fontSize: '2rem', fontWeight: '800', margin: '8px 0', color: 'var(--text-primary)' },
-    accent: {
-      position: 'absolute',
-      left: 0,
-      top: 0,
-      width: '4px',
-      height: '100%',
-      background: 'var(--primary)'
-    }
-  };
+  const recent = [...transactions].slice(0, 5);
 
   return (
-    <div>
-      <header>
-        <h1 style={{ fontWeight: 800 }}>Fintech Command Center</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Welcome back, {user?.name || 'User'}</p>
-      </header>
-
-      <div style={styles.grid}>
-        {/* Total Balance Card */}
-        <div style={styles.card}>
-          <div style={styles.accent}></div>
-          <span style={styles.label}>Total Balance</span>
-          <h2 style={styles.value}>Rs {total}</h2>
-          <span style={{ color: '#10b981', fontSize: '0.85rem' }}>↑ 2.4% from last month</span>
-        </div>
-
-        {/* Income Card */}
-        <div style={{ ...styles.card, borderColor: '#10b981' }}>
-          <span style={styles.label}>Total Income</span>
-          <h2 style={{ ...styles.value, color: '#10b981' }}>Rs {income}</h2>
-        </div>
-
-        {/* Expense Card */}
-        <div style={{ ...styles.card, borderColor: '#ef4444' }}>
-          <span style={styles.label}>Total Expenses</span>
-          <h2 style={{ ...styles.value, color: '#ef4444' }}>Rs {expense}</h2>
-        </div>
+    <div className="dashboard-wrapper">
+      <div className="card" style={{ marginBottom: '18px' }}>
+        <h2 style={{ margin: 0, fontSize: '1.3rem' }}>Welcome back, {user?.name || 'User'} 👋</h2>
+        <p className="text-muted" style={{ margin: '8px 0 0' }}>
+          Track your finances with a clean glass dashboard and instant insights.
+        </p>
       </div>
 
-      <div style={{ ...styles.card, marginTop: '40px', textAlign: 'center', minHeight: '200px' }}>
-         <p style={{ color: 'var(--text-muted)', marginTop: '80px' }}>Visualizing your spending data...</p>
-      </div>
+      <section className="stats-container-modern">
+        <div className="stat-card primary-gradient">
+          <p className="card-label" style={{ color: '#eff4ff' }}>Total Balance</p>
+          <div className="main-metric">
+            <span className="currency">Rs</span>
+            <span className="number">{total.toFixed(2)}</span>
+          </div>
+          <p className="text-sm" style={{ margin: '10px 0 0', color: '#e7f6ff' }}>
+            Real-time net worth based on all transactions.
+          </p>
+        </div>
+
+        <div className="stats-split">
+          <div className="stat-card">
+            <p className="card-label">Income</p>
+            <p className="split-metric text-success">+ Rs {income.toFixed(2)}</p>
+          </div>
+          <div className="stat-card">
+            <p className="card-label">Expenses</p>
+            <p className="split-metric text-danger">- Rs {expense.toFixed(2)}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="dashboard-grid-premium">
+        <div className="card main-chart">
+          <h3 className="card-label">Cashflow Intelligence</h3>
+          <div className="no-data-placeholder" style={{ minHeight: '280px', display: 'grid', placeItems: 'center' }}>
+            Interactive trend visualization coming soon.
+          </div>
+        </div>
+
+        <div className="card side-chart">
+          <h3 className="card-label">Recent Activity</h3>
+          {recent.length === 0 ? (
+            <div className="no-data-placeholder">No recent activity.</div>
+          ) : (
+            <ul className="transaction-list-raw">
+              {recent.map((t) => (
+                <li className="transaction-item" key={t._id}>
+                  <div className="t-info">
+                    <strong>{t.text}</strong>
+                    <span className="t-date">{new Date(t.createdAt).toLocaleString()}</span>
+                  </div>
+                  <div className={`t-amount-group ${t.amount < 0 ? 'text-danger' : 'text-success'}`}>
+                    {t.amount < 0 ? '-' : '+'} Rs {Math.abs(t.amount).toFixed(2)}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

@@ -9,8 +9,9 @@ const Sidebar = ({ isOpen, onClose }) => {
     { path: '/', label: 'Dashboard', icon: '📊' },
     { path: '/transactions', label: 'Transactions', icon: '💸' },
     { path: '/analytics', label: 'Analytics', icon: '📈' },
+    { path: '/budget', label: 'Budget', icon: '🎯' },
     { path: '/history', label: 'History', icon: '📝' },
-    { path: '/settings', label: 'Settings', icon: '⚙️' },
+    { path: '/settings', label: 'Settings', icon: '⚙️' }
   ];
 
   return (
@@ -24,7 +25,12 @@ const Sidebar = ({ isOpen, onClose }) => {
 
       <nav className="sidebar-nav">
         {navItems.map((item) => (
-          <NavLink key={item.path} to={item.path} className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'} onClick={onClose}>
+          <NavLink
+            key={item.path}
+            to={item.path}
+            className={({ isActive }) => (isActive ? 'nav-item active' : 'nav-item')}
+            onClick={onClose}
+          >
             <span className="nav-icon">{item.icon}</span>
             <span className="nav-label">{item.label}</span>
           </NavLink>
@@ -32,14 +38,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       </nav>
 
       <div className="sidebar-footer">
-        <div className="theme-toggle-container">
-            <button className="theme-toggle-btn" onClick={toggleTheme} title="Switch Theme">
-                {user?.theme === 'dark' ? '☀️ Light' : '🌙 Dark'}
-            </button>
-        </div>
+        <button className="theme-toggle-btn" onClick={toggleTheme} title="Switch Theme">
+          {user?.theme === 'dark' ? '☀️ Light mode' : '🌙 Dark mode'}
+        </button>
         <button onClick={logout} className="logout-btn-sidebar">
           <span className="nav-icon">🚪</span>
-          <span className="nav-label desktop-only-text">Logout</span>
+          <span className="nav-label">Logout</span>
         </button>
       </div>
     </aside>
