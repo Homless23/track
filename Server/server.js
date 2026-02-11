@@ -9,7 +9,7 @@ const logger = require('./utils/logger');
 
 // 1. Load & Validate Environment
 dotenv.config();
-const requiredEnv = ['MONGO_URI', 'JWT_SECRET', 'PORT'];
+const requiredEnv = ['MONGO_URI', 'JWT_SECRET'];
 requiredEnv.forEach((env) => {
   if (!process.env[env]) {
     logger.error(`FATAL: Environment variable ${env} is missing.`);
@@ -17,9 +17,17 @@ requiredEnv.forEach((env) => {
   }
 });
 
+if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGINS) {
+  logger.error('FATAL: CORS_ORIGINS is required in production.');
+  process.exit(1);
+}
+
 connectDB();
 
 const app = express();
+
+// Respect proxy headers (required for accurate IP-based rate limiting behind reverse proxies).
+app.set('trust proxy', 1);
 
 // 2. Security Middleware
 app.use(helmet()); // Set secure HTTP headers
@@ -71,6 +79,7 @@ const apiLimiter = rateLimit({
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
+  skipSuccessfulRequests: true,
   message: 'Too many authentication attempts. Please try again later.',
   standardHeaders: true,
   legacyHeaders: false
